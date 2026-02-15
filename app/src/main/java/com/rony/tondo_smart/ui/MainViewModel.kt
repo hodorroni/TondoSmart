@@ -1,11 +1,13 @@
 package com.rony.tondo_smart.ui
 
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.rony.tondo_smart.data.RemoteSchemaDataSource
 import com.rony.tondo_smart.domain.FormField
 import com.rony.tondo_smart.domain.SchemaRepository
 import com.rony.tondo_smart.domain.UiNode
+import com.rony.tondo_smart.domain.toPayload
 import com.rony.tondo_smart.domain.validators.validateAndReturn
 import kotlinx.coroutines.async
 import kotlinx.coroutines.flow.MutableSharedFlow
@@ -14,6 +16,7 @@ import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import org.json.JSONObject
 
 class MainViewModel(
     private val repository: SchemaRepository
@@ -94,6 +97,9 @@ class MainViewModel(
         _formFields.value = validatedFields
         viewModelScope.launch {
             if(isFormValid) {
+                val payload = validatedFields.toPayload()
+                val jsonString = JSONObject(payload).toString()
+                Log.d("FormPayload", jsonString)
                 _events.emit(MainEvents.SuccessMessage("All fields are valid!"))
             } else {
                 _events.emit(MainEvents.ErrorMessage("Fields aren't valid!. Please fix them."))

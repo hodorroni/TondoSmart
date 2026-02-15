@@ -45,3 +45,15 @@ sealed class FormField {
         override var error: String? = null
     ): FormField()
 }
+
+fun List<FormField>.toPayload(): Map<String, Any?> {
+    return this.associate { field ->
+        field.id to when (field) {
+            is FormField.TextField -> field.value
+            is FormField.NumberField -> field.value.toDoubleOrNull()
+            is FormField.BooleanField -> field.value
+            is FormField.DropdownField -> field.selected
+            is FormField.NotSupportedField -> null
+        }
+    }
+}
